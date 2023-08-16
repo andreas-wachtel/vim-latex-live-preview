@@ -2,17 +2,19 @@ make my branch
 
 
 
-intent to use time stamps of synctex file to update it when it is rewritten.
-and do the pdflatex compilation in background
-
-To get a timestamp:
-stat -c '%Y' test.sh
 
 
+Newly DONE:
+Now, vim only waits for the first live-compile to finish.
+Every secondary compile (when the buffer is written to disk) is run in the backgroud, so that you can continue to work in vim while pdflatex is compiling in the background.
 
-command
-:let cc=system("stat -c '%Y' README.md")
-:let dd=system("stat -c '%Y' README2.md")
+After the compilation has finished you may notice (if you pay attention) that the pdf-viewer reloads 
+the recently compiled pdf. As of this point, if you do a single forward search that calls my function UpdateLiveSynctex(), then the synctex file is updated which is necesary for the  forward and backward searches to work correctly.
+
+The vim script part requires to read the time stamp of the synctex file.
+I used the shell command named 'stat':
+stat -c '%Y' test.synctex.gz
+
 
 
 
