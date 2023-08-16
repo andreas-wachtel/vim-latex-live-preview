@@ -69,6 +69,35 @@ EEOOFF
 
 endfunction
 
+
+function! UpdateLiveSynctex()
+	" Added by Andreas Wachtel:
+	" ADDITIONAL requirement 'stat' command.
+	" I changed the variables to global variables, because in a secondary .tex
+	" file there is no access to   b:livepreview_buf_data
+	"
+    let l:newdate = system("stat -c '%Y' ".g:livepreview_tmpSynctex.".gz")
+
+	if g:syncdate < l:newdate
+		" If the above inequality is satisfied, then the synctex has been
+		" updated. Hence, we have to change it again to do de reverse /
+		" forward search.
+
+        " The following established the source file name in the synctex.gz file.
+        " unzip -> sed change tex-source in synctex -> zip
+        silent call system("gzip -d " . g:livepreview_tmpSynctex.".gz")
+
+        silent call system("sed -i -e '2s+^.*$+Input:1:" . g:livepreview_texRoot . "+' " . g:livepreview_tmpSynctex)
+
+        silent call system("gzip " . g:livepreview_tmpSynctex)
+
+		echo 'synctex was updated'
+        let g:syncdate = system("stat -c '%Y' ".g:livepreview_tmpSynctex.".gz")
+	endif
+endfunction
+
+
+
 function! s:Compile()
 
     if !exists('b:livepreview_buf_data') ||
@@ -86,31 +115,7 @@ function! s:Compile()
     " I have to wait for the compilation to finish, so that the synctex file
 	" can be updated.
 	" BEFORE: vim did not wait for compilation.
-    "call s:RunInBackground(b:livepreview_buf_data['run_cmd'])
-
-    " Now: vim waites until compilation is finished to modify the synctex file
-    silent call system(b:livepreview_buf_data['run_cmd'])
-    if v:shell_error != 0
-        echo 'Failed to compile'
-        lcd -
-        return
-    endif
-
-	" FIXME: sometimes if a source.tex file is not opened, the local path
-	" inside vim is messed up. The following line restores the local path
-	" when recomilation is initiated.
-    execute 'lcd ' . b:livepreview_buf_data['root_dir']
-
-    " The following established the source file name in the synctex.gz file.
-    " unzip -> sed change tex-source in synctex -> zip
-    let l:tmp_synctex = b:livepreview_buf_data['tmp_src_file'].".synctex"
-    silent call system("gzip -d " . l:tmp_synctex.".gz")
-
-    let srctex = fnamemodify( b:livepreview_buf_data['tmp_src_file'], ':t:r' )
-    let syncRootFile = b:livepreview_buf_data['root_dir'] . "/./" . srctex . ".tex"
-    silent call system("sed -i -e '2s+^.*$+Input:1:" . syncRootFile . "+' " . l:tmp_synctex)
-
-    silent call system("gzip " . l:tmp_synctex)
+    call s:RunInBackground(b:livepreview_buf_data['run_cmd'])
 
 endfunction
 
@@ -279,23 +284,22 @@ EEOOFF
     let b:livepreview_buf_data['preview_running'] = 1
 
 
+	" ADDED by Andreas Wachtel:
     " The temporary pdf file is needed as a global variable (in .vimrc) to do forwardSearch
     let g:livepreview_tmpPDFfile = l:tmp_out_file
-    let l:tmp_synctex = b:livepreview_buf_data['tmp_src_file'].".synctex"
 
-    " The synctex.gz file is needed at both positions (where .tex is and where .pdf is)
-    "silent call system("ln -fs " . l:tmp_synctex.".gz")
+	" 2 global variables to make updating the synctex file easy and 'robust'
+	" The temporary synctex file
+    let g:livepreview_tmpSynctex = b:livepreview_buf_data['tmp_src_file'].".synctex"
 
-
-    " The following established the source file name in the synctex.gz file.
-    " unzip -> sed change tex-source in synctex -> zip
-    silent call system("gzip -d " . l:tmp_synctex.".gz")
-
+	" the root-file
     let srctex = fnamemodify( b:livepreview_buf_data['tmp_src_file'], ':t:r' )
-    let syncRootFile = b:livepreview_buf_data['root_dir'] . "/./" . srctex . ".tex"
-    silent call system("sed -i -e '2s+^.*$+Input:1:" . syncRootFile . "+' " . l:tmp_synctex)
+    let g:livepreview_texRoot = b:livepreview_buf_data['root_dir'] . "/./" . srctex . ".tex"
 
-    silent call system("gzip " . l:tmp_synctex)
+
+	" update synctex file (first time: take date of .tex)
+    let g:syncdate = system("stat -c '%Y' ".b:livepreview_buf_data['tmp_src_file'])
+	call UpdateLiveSynctex()
 
 endfunction
 

@@ -1,0 +1,19 @@
+make my branch
+
+
+
+intent to use time stamps of synctex file to update it when it is rewritten.
+and do the pdflatex compilation in background
+
+To get a timestamp:
+stat -c '%Y' test.sh
+
+
+
+command
+:let cc=system("stat -c '%Y' README.md")
+:let dd=system("stat -c '%Y' README2.md")
+
+
+
+

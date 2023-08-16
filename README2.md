@@ -1,11 +1,19 @@
-A Vim Plugin for Lively Previewing LaTeX PDF Output
-===================================================
+A Vim Plugin for Lively Previewing LaTeX PDF Output (vim-zathura-synctex)
+=========================================================================
 
-This plugin provides a live preview of the output PDF of your LaTeX file. The
-display of the output PDF file will be updated lively as you type (just hold
+This is a modified copy of the 
+[original plugin](https://github.com/xuhdev/vim-latex-live-preview)
+which provides a live preview of the output PDF of your LaTeX file. 
+I quote: 
+"The display of the output PDF file will be updated lively as you type (just hold
 the cursor and you will see the PDF file updated). Currently,
-vim-latex-live-preview only support UNIX-like systems. [Please let me know if
-you have any suggestions.](.github/CONTRIBUTING.md)
+vim-latex-live-preview only support UNIX-like systems."
+
+The modification consists in enabling Forward and Inverse searches
+between `vim` and the [zathura pdf viewer](https://pwmt.org/projects/zathura/).
+
+
+
 
 Table of Contents
 -----------------
@@ -13,34 +21,19 @@ Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
 - [Configuration](#configuration)
-- [Known issues](#known-issues)
+- [Known issues and Limitations](#known-issues)
 - [Screenshot](#screenshot)
+
+
+
 
 Installation
 ------------
 
 Before installing, you need to make sure your Vim version is later than 7.3,
 and is compiled with `+python` feature.
-
-### [vim-plug](https://github.com/junegunn/vim-plug)
-
-Add the plugin in the vim-plug section of your `~/.vimrc`:
-
-```vim
-call plug#begin('~/.vim/plugged')
-[...]
-" A Vim Plugin for Lively Previewing LaTeX PDF Output
-Plug 'xuhdev/vim-latex-live-preview', { 'for': 'tex' }
-[...]
-call plug#end()
-```
-
-Then reload the config and install the new plugin. Run inside `vim`:
-
-```vim
-:so ~/.vimrc
-:PlugInstall
-```
+Furthermore, install the [zathura pdf viewer](https://pwmt.org/projects/zathura/).
+Here are two ways to install this version of the plugin.
 
 ### [Vundle](https://github.com/VundleVim/Vundle.vim)
 
@@ -50,7 +43,7 @@ Add the plugin in the Vundle section of your `~/.vimrc`:
 call vundle#begin()
 [...]
 " A Vim Plugin for Lively Previewing LaTeX PDF Output
-Plugin 'xuhdev/vim-latex-live-preview'
+Plugin 'andreas-wachtel/vim-latex-live-preview'
 [...]
 call vundle#end()
 ```
@@ -65,6 +58,8 @@ Then reload the config and install the new plugin. Run inside `vim`:
 ### Manually
 
 Copy `plugin/latexlivepreview.vim` to `~/.vim/plugin`.
+
+
 
 Usage
 -----
@@ -89,32 +84,23 @@ case it is **relative to the parent directory of the current file**.
 :warning: if `<root-filename>` contains special characters (such as space), they
 must be escaped manually.
 
+
+
 Configuration
 -------------
 
-### PDF viewer
+TODO: restore
+`stat -c '%Y' filename`
 
-By default, you need to have [evince][] or [okular][] installed as pdf viewers.
-But you can specify your own viewer by setting `g:livepreview_previewer`
-option in your `.vimrc`:
+### Option A: PDF viewer and TeX engine and Synctex support
+At the moment of writing the version of 'vim-latex-live-preview' contained in this fork is needed.
+For the setup details see [my gist](https://gist.github.com/andreas-wachtel/1025a7d2c246af267da2b84234f57d3f).
+I still intent to put a screen-cast.
 
-```vim
-let g:livepreview_previewer = 'your_viewer'
-```
 
-Please note that not every pdf viewer could work with this plugin. Currently
-evince and okular are known to work well. You can find a list of known working
-pdf viewers [here](https://github.com/xuhdev/vim-latex-live-preview/wiki/Known-Working-PDF-Viewers).
+### Option B: PDF viewer and TeX engine (without synctex)
+See [original plugin](https://github.com/xuhdev/vim-latex-live-preview)
 
-### TeX engine
-
-`LLP` uses `pdflatex` as default engine to output a PDF to be previewed. It
-fallbacks to `xelatex` if `pdflatex` is not present. These defaults can be
-overridden by setting `g:livepreview_engine` variable:
-
-```vim
-let g:livepreview_engine = 'your_engine' . ' [options]'
-```
 
 ### TeX Inputs
 
@@ -128,6 +114,7 @@ let g:livepreview_texinputs = '/path1/to/files//:/path2/to/files//'
 ```
 
 Note:  The double trailing `/` tells the compiler to search subdirectories.
+
 
 ### Bibliography executable
 
@@ -160,44 +147,19 @@ hold (autocmd events `CursorHold` and `CursorHoldI`), use the feature flag:
 let g:livepreview_cursorhold_recompile = 0
 ```
 
-Known issues
-------------
 
-### Swap error
+Known issues and Limitations
+----------------------------
 
-An error `E768: Swap file exists` may occur. See
-[issue #7](https://github.com/xuhdev/vim-latex-live-preview/issues/7) to avoid
-swap filename collision.
+For the moment, the issues are the same as those of the original plugin (from xuhdev)
+listed on [known issues](https://github.com/xuhdev/vim-latex-live-preview#known-issues).
 
-### Project tree
 
-Currently, root file must be in the same directory or upper in the project tree
-(otherwise, one has to save file to update the preview).
+### other viewers
+Currently, I cannot get synctex to work between `vim` and the snap version of `evince`.
+I reported the [issue](https://bugs.launchpad.net/ubuntu/+source/snapd/+bug/2031259).
 
-### E492: Not an editor command: LLPStartPreview
 
-See [issue #12](https://github.com/xuhdev/vim-latex-live-preview/issues/12),
-provided the plugin is correctly installed, this is likely a **Python** issue.
-
-### Python-related issues
-
-See [issue #24](https://github.com/xuhdev/vim-latex-live-preview/issues/24),
-currently `vim-latex-live-preview` does not support `python/dyn` and Vim
-must be recompiled with Python support.
-
-### Bibliography issues
-
-Why doesn't my bibliography appear, with or without an error?
-
-See [issue #46](https://github.com/xuhdev/vim-latex-live-preview/issues/46) and 
-[PR #99](https://github.com/xuhdev/vim-latex-live-preview/pull/99).
-If you're using `biblatex` this is most likely caused by not also setting 
-`g:livepreview_use_biber = 1` in your `.vimrc`. Or if you intended to use
-`bibtex` not using that option when using the `biblatex` package. i.e.
-
-```latex
-\usepackage[backend=bibtex]{biblatex}
-```
 
 
 Screenshot
