@@ -1,15 +1,19 @@
-make my branch
+Checkout original master as branch (so a pull request can be made)
 
+
+make my branch
 
 
 
 
 Newly DONE:
 Now, vim only waits for the first live-compile to finish.
-Every secondary compile (when the buffer is written to disk) is run in the backgroud, so that you can continue to work in vim while pdflatex is compiling in the background.
+Every secondary compile (when the buffer is written to disk) is run in the backgroud, so that you can continue to work in vim while pdflatex / latexmk is compiling in the background.
 
 After the compilation has finished you may notice (if you pay attention) that the pdf-viewer reloads 
-the recently compiled pdf. As of this point, if you do a single forward search that calls my function UpdateLiveSynctex(), then the synctex file is updated which is necesary for the  forward and backward searches to work correctly.
+the recently compiled pdf. 
+
+As of this point, if you do a single forward search that calls my function UpdateLiveSynctex(), then the synctex file is updated which is necesary for the  forward and backward searches to work correctly.
 
 The vim script part requires to read the time stamp of the synctex file.
 I used the shell command named 'stat':
@@ -19,3 +23,18 @@ stat -c '%Y' test.synctex.gz
 
 
 
+
+# default extension for master (And I live on a branch)
+73: remove: UpdateLiveSynctex
+
+
+103: update s:Compile
+
+126: use the original (master version):  s:StartPreview(...)
+
+325: update s:Initialize
+  (lines 367 - 386)
+
+408: add case separation for when latexmk is used.
+
+429: new function:  s:StartPreviewLatexmk(...)

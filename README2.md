@@ -89,6 +89,19 @@ must be escaped manually.
 Configuration
 -------------
 
+DONE: enable latexmk funcion (in code)  
+TODO: describe in readme: what to put in .vimrc  to make it use latexmk.
+TODO: describe in readme: how to setup backward (zathura config) and forward search (.vimrc config)
+TODO: describe in readme: zathura with history in temp. directory.
+TODO: mention in readme: that latexmk takes care of  bibtex  and  makeindex  compilations. 
+  Therefore, some bugs of the original plugin are solved.
+
+TODO: If you want to use pdflatex (without latexmk) and use synctex please go to the secondary branch.
+There is a need, to update the synctex file (which is done  automatically by latexmk, but not by pdflatex)
+
+
+
+
 TODO: restore
 `stat -c '%Y' filename`
 
