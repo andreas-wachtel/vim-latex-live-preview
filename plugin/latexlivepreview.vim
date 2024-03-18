@@ -523,7 +523,9 @@ EEOOFF
 	            \       l:relativeTexRoot
 
 	silent call system(b:livepreview_buf_data['run_cmd'])
-	if v:shell_error != 0
+	if v:shell_error == 12
+		echo 'latexmk returned 12: possibly makeindex failed'
+	elseif v:shell_error != 0
 		echo 'Failed to compile'
 		lcd -
 		return
